@@ -14,19 +14,17 @@ export default function HomeScreen({ navigation }) {
 
     return (
     <ScrollView style={styles.container}>
-      {/* HEADER */}
-      <View style={styles.header}>
-        {/* Logo and "Cona" name side by side */}
-        <View style={styles.logoRow}>
-          <Image
-            source={require('../assets/cona-logo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.logoText}>Cona</Text>
-        </View>
-        <View style={styles.profileCircle} />
-      </View>
+   <View style={styles.header}>
+  <View style={styles.logoRow}>
+    <Image source={require('../assets/cona-logo.png')} style={styles.logo} resizeMode="contain" />
+    <Text style={styles.logoText}>Cona</Text>
+  </View>
+  <View style={styles.profileWrapper}>
+    <Image source={require('../assets/noimageprofile.png')} style={styles.profileImage} resizeMode="cover" />
+  </View>
+</View>
+
+
 
       {/* DATE SELECTOR */}
       <View style={styles.section}>
@@ -414,4 +412,66 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
   },
+  header: {
+    backgroundColor: '#142029',
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  logo: {
+    height: 40,
+    width: 40,
+  },
+  logoText: {
+    fontSize: 24,
+    color: '#A7EE43',
+    fontFamily: 'PlusJakarta-Bold',
+  },
+  profileImage: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+  },
+  header: {
+    backgroundColor: '#142029',
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    height: 36,
+    width: 36,
+  },
+  logoText: {
+    fontSize: 24,
+    color: '#A7EE43',
+    fontFamily: 'PlusJakarta-Bold',
+    marginLeft: 8,
+  },
+  profileWrapper: {
+    backgroundColor: '#A7EE43',
+    borderRadius: 999,
+    padding: 3,
+  },
+  profileImage: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+  },
+  
 });

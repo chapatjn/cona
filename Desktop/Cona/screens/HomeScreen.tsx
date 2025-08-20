@@ -11,21 +11,8 @@ import {
 } from 'react-native';
 
 export default function HomeScreen({ navigation }) {
-
-    return (
+  return (
     <ScrollView style={styles.container}>
-   <View style={styles.header}>
-  <View style={styles.logoRow}>
-    <Image source={require('../assets/cona-logo.png')} style={styles.logo} resizeMode="contain" />
-    <Text style={styles.logoText}>Cona</Text>
-  </View>
-  <View style={styles.profileWrapper}>
-    <Image source={require('../assets/noimageprofile.png')} style={styles.profileImage} resizeMode="cover" />
-  </View>
-</View>
-
-
-
       {/* DATE SELECTOR */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Fecha</Text>
@@ -52,8 +39,9 @@ export default function HomeScreen({ navigation }) {
           {[1, 2].map((_, i) => (
             <View key={i} style={styles.matchCard}>
               <Image
-                source={require('../assets/canchaCerroAlto.png')}
+                source={require('../assets/furati.png')}
                 style={styles.matchImage}
+                 resizeMode="cover"
               />
               <Text style={styles.matchTitle}>Furati (Fut 5)</Text>
               <Text style={styles.matchTime}>🕒 7:00 - 9:00 pm</Text>
@@ -67,19 +55,22 @@ export default function HomeScreen({ navigation }) {
               <View style={styles.matchBottomRow}>
                 <Text style={styles.price}>₡ 3,000</Text>
                 <TouchableOpacity
-  style={styles.playButton}
-  onPress={() => navigation.navigate('MatchInfo')}>
-  <Text style={styles.playText}>Jugar</Text>
-</TouchableOpacity>
-
+                  style={styles.playButton}
+                  onPress={() => navigation.navigate('MatchInfo')}
+                >
+                  <Text style={styles.playText}>Jugar</Text>
+                </TouchableOpacity>
               </View>
             </View>
           ))}
         </ScrollView>
 
-        <TouchableOpacity style={styles.viewAllButton} onPress={() => navigation.navigate('AllMatches')}>
-  <Text style={styles.viewAllText}>Ver todas</Text>
-</TouchableOpacity>
+        <TouchableOpacity
+          style={styles.viewAllButton}
+          onPress={() => navigation.navigate('AllMatches')}
+        >
+          <Text style={styles.viewAllText}>Ver todas</Text>
+        </TouchableOpacity>
       </View>
 
       {/* GOLEADORES */}
@@ -152,45 +143,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     flex: 1,
   },
-  header: {
-    backgroundColor: '#142029',
-    paddingHorizontal: 16,
-    paddingTop: 50,
-    paddingBottom: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  logo: {
-    height: 40,
-    width: 40,
-  },
-  logoText: {
-    fontSize: 24,
-    color: '#A7EE43',
-    fontFamily: 'PlusJakarta-Bold',
-    marginLeft: 8,
-  },
-  profileCircle: {
-    backgroundColor: '#A7EE43',
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-  },
   section: {
     paddingHorizontal: 16,
-    paddingTop: 24,
+    paddingTop: 70,
   },
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'PlusJakarta-Bold',
     color: '#142029',
-    marginBottom: 12,
+    marginBottom: 1,
   },
   dateRow: {
     flexDirection: 'row',
@@ -412,66 +373,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
   },
-  header: {
-    backgroundColor: '#142029',
-    paddingHorizontal: 16,
-    paddingTop: 50,
-    paddingBottom: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  logo: {
-    height: 40,
-    width: 40,
-  },
-  logoText: {
-    fontSize: 24,
-    color: '#A7EE43',
-    fontFamily: 'PlusJakarta-Bold',
-  },
-  profileImage: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-  },
-  header: {
-    backgroundColor: '#142029',
-    paddingHorizontal: 16,
-    paddingTop: 50,
-    paddingBottom: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logo: {
-    height: 36,
-    width: 36,
-  },
-  logoText: {
-    fontSize: 24,
-    color: '#A7EE43',
-    fontFamily: 'PlusJakarta-Bold',
-    marginLeft: 8,
-  },
-  profileWrapper: {
-    backgroundColor: '#A7EE43',
-    borderRadius: 999,
-    padding: 3,
-  },
-  profileImage: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-  },
+  matchImage: {
+    width: '100%',
+    height: 160,
+    borderRadius: 8,
+    marginBottom: 12,
+  }
+  
   
 });

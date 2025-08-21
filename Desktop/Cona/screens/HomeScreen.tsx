@@ -1,6 +1,5 @@
+// screens/HomeScreen.tsx
 import React from 'react';
-import { useNavigation } from '@react-navigation/native';
-
 import {
   View,
   Text,
@@ -9,12 +8,20 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../types/navigation';
 
-export default function HomeScreen({ navigation }) {
+type Nav = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+
+export default function HomeScreen() {
+  const navigation = useNavigation<Nav>();
+
   return (
-    <ScrollView style={styles.container}>
+    
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 80 }} >
       {/* DATE SELECTOR */}
-      <View style={styles.section}>
+      <View style={styles.sectionFirst}>
         <Text style={styles.sectionTitle}>Fecha</Text>
         <View style={styles.dateRow}>
           {['Dom', 'Lun', 'Mar', 'Mie', 'Jue'].map((day, i) => (
@@ -41,7 +48,7 @@ export default function HomeScreen({ navigation }) {
               <Image
                 source={require('../assets/furati.png')}
                 style={styles.matchImage}
-                 resizeMode="cover"
+                resizeMode="cover"
               />
               <Text style={styles.matchTitle}>Furati (Fut 5)</Text>
               <Text style={styles.matchTime}>🕒 7:00 - 9:00 pm</Text>
@@ -85,13 +92,7 @@ export default function HomeScreen({ navigation }) {
               </View>
               <View style={styles.avatar} />
               <Text style={styles.emoji}>
-                {rank === 1
-                  ? '🥇'
-                  : rank === 2
-                  ? '🥈'
-                  : rank === 3
-                  ? '🥉'
-                  : '⚽'}
+                {rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '⚽'}
               </Text>
             </View>
             <View style={styles.playerCenter}>
@@ -109,9 +110,7 @@ export default function HomeScreen({ navigation }) {
               <Text style={styles.level}>Nivel Alto</Text>
             </View>
             <View style={styles.goals}>
-              <Text style={styles.goalNumber}>
-                {[18, 14, 11, 7, 6][i]}
-              </Text>
+              <Text style={styles.goalNumber}>{[18, 14, 11, 7, 6][i]}</Text>
               <Text style={styles.goalLabel}>Goles</Text>
             </View>
           </View>
@@ -123,17 +122,27 @@ export default function HomeScreen({ navigation }) {
       {/* TOURNAMENTS */}
       <View style={styles.tournaments}>
         <Text style={styles.sectionTitle}>Torneos</Text>
-        <Text style={styles.subtext}>
-          Próximos torneos y competiciones
-        </Text>
+        <Text style={styles.subtext}>Próximos torneos y competiciones</Text>
         <View style={styles.tournamentBox}>
           <View style={styles.tournamentIcon} />
           <Text style={styles.tournamentText}>
-            Actualmente no hay torneos programados. ¡Mantente atento para
-            futuras competiciones!
+            Actualmente no hay torneos programados. ¡Mantente atento para futuras
+            competiciones!
           </Text>
         </View>
       </View>
+
+      {/* --- DEV: tiny button at the very bottom --- */}
+      {__DEV__ && (
+        
+        <TouchableOpacity
+          style={styles.devBtn}
+          onPress={() => (navigation as any).navigate('DevMenu')}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.devBtnText}>DEV MENU</Text>
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
 }
@@ -143,10 +152,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     flex: 1,
   },
+  // Replace your current section style with these two
   section: {
     paddingHorizontal: 16,
-    paddingTop: 70,
+    paddingTop: 16, // tighter default for all sections
   },
+  sectionFirst: {
+    paddingTop: 70,
+    paddingHorizontal: 16,
+    // only the first block needs extra top space
+  },
+
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'PlusJakarta-Bold',
@@ -156,6 +172,7 @@ const styles = StyleSheet.create({
   dateRow: {
     flexDirection: 'row',
     gap: 8,
+    paddingTop: 10,
   },
   dateItem: {
     paddingVertical: 9,
@@ -164,22 +181,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  activeDate: {
-    backgroundColor: '#A7EE43',
-  },
-  inactiveDate: {
-    backgroundColor: '#F4F5F6',
-  },
-  dateDay: {
-    fontSize: 12,
-    color: '#142029',
-    fontFamily: 'PlusJakarta-Regular',
-  },
-  dateNum: {
-    fontSize: 18,
-    color: '#142029',
-    fontFamily: 'PlusJakarta-Bold',
-  },
+  activeDate: { backgroundColor: '#A7EE43' },
+  inactiveDate: { backgroundColor: '#F4F5F6' },
+  dateDay: { fontSize: 12, color: '#142029', fontFamily: 'PlusJakarta-Regular' },
+  dateNum: { fontSize: 18, color: '#142029', fontFamily: 'PlusJakarta-Bold' },
+
   matchCard: {
     backgroundColor: '#142029',
     width: 280,
@@ -187,93 +193,23 @@ const styles = StyleSheet.create({
     padding: 16,
     marginRight: 16,
   },
-  matchImage: {
-    height: 160,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  matchTitle: {
-    color: '#A7EE43',
-    fontFamily: 'PlusJakarta-Bold',
-    fontSize: 18,
-    marginBottom: 4,
-  },
-  matchTime: {
-    color: '#A7EE43',
-    fontSize: 14,
-    fontFamily: 'PlusJakarta-Regular',
-    marginBottom: 4,
-  },
-  matchSubtext: {
-    color: '#A7EE43',
-    fontSize: 12,
-    fontFamily: 'PlusJakarta-Regular',
-    marginBottom: 4,
-  },
-  matchProgress: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-    gap: 8,
-  },
-  progressBackground: {
-    backgroundColor: '#D4D6DA',
-    width: 120,
-    height: 10,
-    borderRadius: 16,
-  },
-  progressBar: {
-    width: 36,
-    height: 10,
-    backgroundColor: '#A7EE43',
-    borderRadius: 16,
-  },
-  matchAvailability: {
-    color: '#A7EE43',
-    fontSize: 12,
-  },
-  matchBottomRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  price: {
-    color: '#A7EE43',
-    fontSize: 16,
-    fontFamily: 'PlusJakarta-Bold',
-  },
-  playButton: {
-    backgroundColor: '#A7EE43',
-    paddingVertical: 6,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-  },
-  playText: {
-    fontSize: 12,
-    fontFamily: 'PlusJakarta-Bold',
-    color: '#142029',
-  },
-  viewAllButton: {
-    marginTop: 12,
-    backgroundColor: '#142029',
-    borderRadius: 8,
-    alignItems: 'center',
-    padding: 10,
-  },
-  viewAllText: {
-    color: '#FFF',
-    fontFamily: 'PlusJakarta-Bold',
-  },
-  scorersSection: {
-    paddingHorizontal: 16,
-    paddingTop: 24,
-  },
-  subtext: {
-    fontSize: 14,
-    fontFamily: 'PlusJakarta-Regular',
-    color: '#4B5563',
-    marginBottom: 12,
-  },
+  matchImage: { width: '100%', height: 160, borderRadius: 8, marginBottom: 12 },
+  matchTitle: { color: '#A7EE43', fontFamily: 'PlusJakarta-Bold', fontSize: 18, marginBottom: 4 },
+  matchTime: { color: '#A7EE43', fontSize: 14, fontFamily: 'PlusJakarta-Regular', marginBottom: 4 },
+  matchSubtext: { color: '#A7EE43', fontSize: 12, fontFamily: 'PlusJakarta-Regular', marginBottom: 4 },
+  matchProgress: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, gap: 8 },
+  progressBackground: { backgroundColor: '#D4D6DA', width: 120, height: 10, borderRadius: 16 },
+  progressBar: { width: 36, height: 10, backgroundColor: '#A7EE43', borderRadius: 16 },
+  matchAvailability: { color: '#A7EE43', fontSize: 12 },
+  matchBottomRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  price: { color: '#A7EE43', fontSize: 16, fontFamily: 'PlusJakarta-Bold' },
+  playButton: { backgroundColor: '#A7EE43', paddingVertical: 6, paddingHorizontal: 16, borderRadius: 16 },
+  playText: { fontSize: 12, fontFamily: 'PlusJakarta-Bold', color: '#142029' },
+  viewAllButton: { marginTop: 12, backgroundColor: '#142029', borderRadius: 8, alignItems: 'center', padding: 10 },
+  viewAllText: { color: '#FFF', fontFamily: 'PlusJakarta-Bold' },
+
+  scorersSection: { paddingHorizontal: 16, paddingTop: 24 },
+  subtext: { fontSize: 14, fontFamily: 'PlusJakarta-Regular', color: '#4B5563', marginBottom: 12 },
   playerCard: {
     backgroundColor: '#FFF',
     padding: 12,
@@ -288,11 +224,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
-  playerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
+  playerLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   rankCircle: {
     width: 24,
     height: 24,
@@ -301,47 +233,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rankText: {
-    color: '#142029',
-    fontFamily: 'PlusJakarta-Bold',
-    fontSize: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#D9D9D9',
-    borderRadius: 20,
-  },
-  emoji: {
-    fontSize: 20,
-    marginLeft: 4,
-  },
-  playerCenter: {
-    flex: 1,
-  },
-  playerName: {
-    fontSize: 16,
-    fontFamily: 'PlusJakarta-Bold',
-    color: '#000',
-  },
-  level: {
-    fontSize: 14,
-    fontFamily: 'PlusJakarta-Regular',
-    color: '#4B5563',
-  },
-  goals: {
-    alignItems: 'flex-end',
-  },
-  goalNumber: {
-    fontSize: 18,
-    fontFamily: 'PlusJakarta-Bold',
-    color: '#142029',
-  },
-  goalLabel: {
-    fontSize: 14,
-    fontFamily: 'PlusJakarta-Regular',
-    color: '#4B5563',
-  },
+  rankText: { color: '#142029', fontFamily: 'PlusJakarta-Bold', fontSize: 12 },
+  avatar: { width: 40, height: 40, backgroundColor: '#D9D9D9', borderRadius: 20 },
+  emoji: { fontSize: 20, marginLeft: 4 },
+  playerCenter: { flex: 1 },
+  playerName: { fontSize: 16, fontFamily: 'PlusJakarta-Bold', color: '#000' },
+  level: { fontSize: 14, fontFamily: 'PlusJakarta-Regular', color: '#4B5563' },
+  goals: { alignItems: 'flex-end' },
+  goalNumber: { fontSize: 18, fontFamily: 'PlusJakarta-Bold', color: '#142029' },
+  goalLabel: { fontSize: 14, fontFamily: 'PlusJakarta-Regular', color: '#4B5563' },
+
   link: {
     color: '#A7EE43',
     fontFamily: 'PlusJakarta-Bold',
@@ -349,36 +250,25 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 16,
   },
-  tournaments: {
-    padding: 16,
-    backgroundColor: '#F4F5F6',
-    marginTop: 24,
-  },
-  tournamentBox: {
-    backgroundColor: '#FFF',
-    padding: 16,
-    borderRadius: 16,
-    alignItems: 'center',
-  },
-  tournamentIcon: {
-    width: 50,
-    height: 50,
-    backgroundColor: '#4B5563',
-    borderRadius: 25,
-    marginBottom: 16,
-  },
-  tournamentText: {
-    color: '#4B5563',
-    fontFamily: 'PlusJakarta-Bold',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  matchImage: {
-    width: '100%',
-    height: 160,
+
+  tournaments: { padding: 16, backgroundColor: '#F4F5F6', marginTop: 24, paddingBottom: 140  },
+  tournamentBox: { backgroundColor: '#FFF', padding: 16, borderRadius: 16, alignItems: 'center'},
+  tournamentIcon: { width: 50, height: 50, backgroundColor: '#4B5563', borderRadius: 25, marginBottom: 16 },
+  tournamentText: { color: '#4B5563', fontFamily: 'PlusJakarta-Bold', fontSize: 14, textAlign: 'center' },
+
+  // --- tiny DEV button ---
+  devBtn: {
+    alignSelf: 'center',
+    marginTop: 16,
+    marginBottom: 24,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 8,
-    marginBottom: 12,
-  }
-  
-  
+    backgroundColor: '#EAEAEA',
+  },
+  devBtnText: {
+    color: '#142029',
+    fontFamily: 'PlusJakarta-Bold',
+    fontSize: 12,
+  },
 });

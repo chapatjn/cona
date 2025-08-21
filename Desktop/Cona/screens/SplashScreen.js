@@ -1,3 +1,4 @@
+// screens/SplashScreen.js
 import React, { useEffect } from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -7,7 +8,11 @@ export default function SplashScreen() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      navigation.replace('Home');
+      // Go into the tab navigator so the footer shows on Home/others
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainTabs', params: { screen: 'Home' } }],
+      });
     }, 2000); // 2 seconds delay
 
     return () => clearTimeout(timeout);

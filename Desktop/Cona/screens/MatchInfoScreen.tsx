@@ -1,4 +1,4 @@
-// screens/MatchInfoScreen.js
+// screens/MatchInfoScreen.tsx
 import React, { useMemo } from 'react';
 import {
   View,
@@ -11,16 +11,20 @@ import {
   Share,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../types/navigation';
 
 const FOOTER_HEIGHT = 120;
 
+type Nav = NativeStackNavigationProp<RootStackParamList, 'MatchInfo'>;
+
 export default function MatchInfoScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<Nav>();
 
   // ---- Mock match data ----
   const pricePerPlayerCRC = 3000;
   const capacity = 12;
-  const players = [
+  const players: string[] = [
     'Wilmer López',
     'Javier Córdova',
     'Luis Fernandez',
@@ -38,7 +42,7 @@ export default function MatchInfoScreen() {
     return `Quedan ${spotsLeft} ${spotsLeft === 1 ? 'Cupo' : 'Cupos'}`;
   }, [isFull, spotsLeft]);
 
-  const formatCRC = (val) => {
+  const formatCRC = (val: number) => {
     try {
       return new Intl.NumberFormat('es-CR', {
         style: 'currency',
@@ -52,14 +56,10 @@ export default function MatchInfoScreen() {
 
   const onJoin = () => {
     if (isFull || userHasJoined) return;
-    navigation.navigate('Pay', {
-      venueName: 'Furati',
-      fieldNumber: '4',
-      dateLabel: 'domingo 24 de agosto, 2025',
-      timeLabel: '19:00-20:00',
-      pricePerPlayerCRC,
-      defaultPlayers: 1,
-    });
+    // If your route is named "Pay" instead of "Payment", change the string here.
+    navigation.navigate('Payment', {
+      matchId: 'mock-123', // optional param if you typed it
+    } as any);
   };
 
   const onShare = async () => {
@@ -68,7 +68,7 @@ export default function MatchInfoScreen() {
         message:
           'Únete a este partido en Cona: Furati 5v5 • domingo 24 de agosto, 2025 • 19:00-20:00. ¡Nos vemos en la cancha! ⚽',
       });
-    } catch (e) {
+    } catch {
       // no-op
     }
   };
@@ -82,22 +82,15 @@ export default function MatchInfoScreen() {
         <View style={styles.section}>
           {/* Top Row: Back + Share */}
           <View style={styles.topRow}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.iconButton}
-            >
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconButton}>
               <Text style={styles.backArrow}>←</Text>
               <Text style={styles.backText}>Volver</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={onShare}
-              style={styles.iconButtonRight}
-            >
+            <TouchableOpacity onPress={onShare} style={styles.iconButtonRight}>
               <Image
-                source={require('../assets/share-icon.png')} // 👈 your image
+                source={require('../assets/share-icon.png')}
                 style={styles.shareIcon}
-            
               />
             </TouchableOpacity>
           </View>
@@ -107,11 +100,11 @@ export default function MatchInfoScreen() {
           <Text style={styles.subtext}>Domingo 24 de Marzo • 19:00 - 20:00</Text>
 
           <View style={{ position: 'relative' }}>
-          <Image
-                source={require('../assets/furati.png')}
-                style={styles.matchImage}
-                 resizeMode="cover"
-              />
+            <Image
+              source={require('../assets/furati.png')}
+              style={styles.matchImage}
+              resizeMode="cover"
+            />
             <View style={styles.availabilityTag}>
               <Text style={styles.availabilityText}>
                 {isFull ? 'Sin cupos' : `${spotsLeft} Cupo${spotsLeft === 1 ? '' : 's'} Disponibles`}
@@ -152,14 +145,22 @@ export default function MatchInfoScreen() {
             <Text style={styles.cardTitle}>Jugadores</Text>
             <View style={styles.playersWrapper}>
               <View style={styles.playersColumn}>
-                {['Wilmer López', 'Javier Córdova', 'Luis Fernandez', 'Santiago Torres'].map((player, i) => (
-                  <Text key={i} style={styles.playerName}>{player}</Text>
-                ))}
+                {['Wilmer López', 'Javier Córdova', 'Luis Fernandez', 'Santiago Torres'].map(
+                  (player, i) => (
+                    <Text key={i} style={styles.playerName}>
+                      {player}
+                    </Text>
+                  )
+                )}
               </View>
               <View style={styles.playersColumn}>
-                {['Carlos Martínez', 'Patrick Pemberton', 'Diego Pérez', 'Endrick García'].map((player, i) => (
-                  <Text key={i} style={styles.playerName}>{player}</Text>
-                ))}
+                {['Carlos Martínez', 'Patrick Pemberton', 'Diego Pérez', 'Endrick García'].map(
+                  (player, i) => (
+                    <Text key={i} style={styles.playerName}>
+                      {player}
+                    </Text>
+                  )
+                )}
               </View>
             </View>
           </View>
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 40, // top padding
+    paddingTop: 40,
     marginBottom: 16,
   },
   iconButton: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 4 },
@@ -234,12 +235,17 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: 'PlusJakarta-Bold',
     color: '#142029',
-    marginTop: 12, // spacing from top row
+    marginTop: 12,
     marginBottom: 4,
   },
   subtext: { fontSize: 16, color: '#4B5563', marginBottom: 16, fontFamily: 'PlusJakarta-Regular' },
 
-  image: { width: '100%', height: 179, borderRadius: 8, marginBottom: 8 },
+  matchImage: {
+    width: '100%',
+    height: 160,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
   availabilityTag: {
     position: 'absolute',
     top: 16,
@@ -297,7 +303,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#142029',
     paddingHorizontal: 16,
     paddingTop: 10,
-    paddingBottom: 12,
+    paddingBottom: 20,
   },
   footerTopRow: {
     flexDirection: 'row',
@@ -306,14 +312,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   priceBlock: { width: 140, paddingVertical: 4 },
-  priceText: { color: '#A7EE43', fontSize: 24, fontFamily: 'PlusJakarta-Bold' },
+  priceText: { color: '#A7EE43', fontSize: 20, fontFamily: 'PlusJakarta-Bold' },
   priceSub: { color: '#A7EE43', fontSize: 14, fontFamily: 'PlusJakarta-Regular' },
   statusBlock: { alignItems: 'flex-start', paddingVertical: 4 },
   statusMain: { color: '#A7EE43', fontSize: 14, fontFamily: 'PlusJakarta-Bold' },
   statusSub: { color: '#A7EE43', fontSize: 12, fontFamily: 'PlusJakarta-Regular' },
   footerBottomRow: {},
   joinBtn: {
-    height: 48,
+    height: 46,
     borderRadius: 16,
     backgroundColor: '#A7EE43',
     alignItems: 'center',
@@ -322,19 +328,4 @@ const styles = StyleSheet.create({
   joinBtnPressed: { opacity: 0.9, transform: [{ scale: 0.995 }] },
   joinBtnDisabled: { backgroundColor: '#9bbf62', opacity: 0.8 },
   joinText: { color: '#142029', fontSize: 20, fontFamily: 'PlusJakarta-Bold' },
-  matchImage: {
-    width: '100%',
-    height: 160,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  image: {
-    width: '100%',
-    height: 200, // same height as HomeScreen
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    resizeMode: 'cover',
-    marginBottom: 8,
-  },
-  
 });

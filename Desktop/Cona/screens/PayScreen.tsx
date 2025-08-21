@@ -1,4 +1,4 @@
-// screens/PayScreen.js
+// screens/PayScreen.tsx
 import React, { useMemo, useState } from 'react';
 import {
   View,
@@ -18,7 +18,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 const FOOTER_HEIGHT = 80;
 const MAX_PER_RESERVA = 4;
 
-const formatCRC = (val) => {
+const formatCRC = (val: number) => {
   try {
     return new Intl.NumberFormat('es-CR', {
       style: 'currency',
@@ -31,10 +31,10 @@ const formatCRC = (val) => {
 };
 
 export default function PayScreen() {
-  const navigation = useNavigation();
-  const route = useRoute();
+  const navigation = useNavigation<any>(); // TS-safe for now
+  const route = useRoute<any>();           // TS-safe for now
 
-  // Expected params from MatchInfoScreen
+  // Expected params from MatchInfoScreen (all optional with sensible fallbacks)
   const {
     venueName = 'Furati',
     fieldNumber = '4',
@@ -42,12 +42,14 @@ export default function PayScreen() {
     timeLabel = '19:00-20:00',
     pricePerPlayerCRC = 3000,
     defaultPlayers = 1,
-  } = route.params || {};
+  } = (route?.params as any) || {};
 
-  const [qty, setQty] = useState(Math.max(1, Math.min(defaultPlayers, MAX_PER_RESERVA)));
-  const [addModalVisible, setAddModalVisible] = useState(false);
-  const [search, setSearch] = useState('');
-  const total = useMemo(() => pricePerPlayerCRC * qty, [pricePerPlayerCRC, qty]);
+  const [qty, setQty] = useState<number>(
+    Math.max(1, Math.min(Number(defaultPlayers) || 1, MAX_PER_RESERVA))
+  );
+  const [addModalVisible, setAddModalVisible] = useState<boolean>(false);
+  const [search, setSearch] = useState<string>('');
+  const total = useMemo<number>(() => pricePerPlayerCRC * qty, [pricePerPlayerCRC, qty]);
 
   const onPay = () => {
     Alert.alert('Pago', 'Procesando pago (demo).');
@@ -59,7 +61,7 @@ export default function PayScreen() {
         message: `Reserva en ${venueName}, cancha ${fieldNumber} — ${dateLabel} ${timeLabel}. ¡Nos vemos en la cancha!`,
       });
     } catch (e) {
-      console.log(e);
+      // no-op
     }
   };
 
@@ -213,7 +215,7 @@ export default function PayScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Search input (styled like your mock) */}
+          {/* Search input */}
           <View style={styles.searchRow}>
             <TextInput
               value={search}
@@ -432,7 +434,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'PlusJakarta-Regular',
   },
-  // Simple magnifying glass made of a circle + handle to mimic your mock
+  // Simple magnifying glass to mimic your mock
   searchIconBox: { width: 16, height: 16, position: 'relative' },
   searchCircle: {
     position: 'absolute',

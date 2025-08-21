@@ -1,4 +1,3 @@
-// screens/AllMatchesScreen.js
 import React from 'react';
 import {
   View,
@@ -6,14 +5,18 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image
+  Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../types/navigation';
 
 const FOOTER_HEIGHT = 91;
 
+type Nav = NativeStackNavigationProp<RootStackParamList, 'AllMatches'>;
+
 export default function AllMatchesScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<Nav>();
 
   return (
     <View style={styles.screen}>
@@ -23,10 +26,7 @@ export default function AllMatchesScreen() {
       >
         {/* Back + Count Row */}
         <View style={styles.topRow}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backBtn}
-          >
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
             <Text style={styles.backArrow}>←</Text>
             <Text style={styles.backText}>Volver</Text>
           </TouchableOpacity>
@@ -40,11 +40,7 @@ export default function AllMatchesScreen() {
         </View>
 
         {/* Filter row */}
-        <ScrollView
-          horizontal
-          style={styles.filters}
-          showsHorizontalScrollIndicator={false}
-        >
+        <ScrollView horizontal style={styles.filters} showsHorizontalScrollIndicator={false}>
           {['Fecha', 'Tipo', 'Zona', 'Horario', 'Ordenar'].map((filter, i) => (
             <View key={i} style={styles.filterItem}>
               <Text style={styles.filterText}>{filter}</Text>
@@ -56,19 +52,18 @@ export default function AllMatchesScreen() {
         <View style={styles.matchList}>
           {[1, 2, 3].map((_, i) => (
             <View key={i} style={styles.matchCard}>
-              <Image
-                source={require('../assets/furati.png')}
-                style={styles.matchImage}
-              />
+              <Image source={require('../assets/furati.png')} style={styles.matchImage} />
               <Text style={styles.matchTitle}>Furati (Fut 5)</Text>
               <Text style={styles.matchTime}>🕒 7:00 - 9:00 pm</Text>
               <Text style={styles.matchSubtext}>Campos Disponibles</Text>
+
               <View style={styles.matchProgress}>
                 <View style={styles.progressBackground}>
                   <View style={styles.progressBar} />
                 </View>
                 <Text style={styles.matchAvailability}>3/10</Text>
               </View>
+
               <View style={styles.matchBottomRow}>
                 <Text style={styles.price}>₡ 3,000</Text>
                 <TouchableOpacity
@@ -90,7 +85,6 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   container: { flex: 1, backgroundColor: '#FFF' },
 
-  // Top Row
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -103,21 +97,14 @@ const styles = StyleSheet.create({
   backText: { fontSize: 16, color: '#142029', fontFamily: 'PlusJakarta-Regular' },
   countText: { fontSize: 14, color: '#4B5563', fontFamily: 'PlusJakarta-Regular' },
 
-  // Section title
   titleSection: {
     padding: 16,
     borderBottomColor: '#4B5563',
     borderBottomWidth: 1,
   },
   title: { fontSize: 20, color: '#142029', fontFamily: 'PlusJakarta-Bold' },
-  subtitle: {
-    marginTop: 4,
-    fontSize: 16,
-    color: '#4B5563',
-    fontFamily: 'PlusJakarta-Regular',
-  },
+  subtitle: { marginTop: 4, fontSize: 16, color: '#4B5563', fontFamily: 'PlusJakarta-Regular' },
 
-  // Filters
   filters: { paddingHorizontal: 16, paddingVertical: 10, backgroundColor: '#F4F5F6' },
   filterItem: {
     paddingHorizontal: 12,
@@ -129,7 +116,6 @@ const styles = StyleSheet.create({
   },
   filterText: { fontSize: 12, color: '#142029', fontFamily: 'Inter' },
 
-  // Matches (copied style from HomeScreen)
   matchList: { paddingHorizontal: 16, paddingTop: 10 },
   matchCard: {
     backgroundColor: '#142029',

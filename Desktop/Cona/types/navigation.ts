@@ -7,6 +7,7 @@ export type RootStackParamList = {
     Home: undefined;
     AllMatches: undefined;
     MatchInfo: undefined | { matchId?: string };
+    EndMatch: { matchId?: string } | undefined;
   
     Profile: undefined;
     Payment: undefined | { matchId?: string };

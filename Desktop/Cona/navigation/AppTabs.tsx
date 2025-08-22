@@ -60,6 +60,8 @@ export default function AppTabs() {
         options={{ title: 'Crear' }}
       />
      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
+
+     
     </Tab.Navigator>
   );
 }

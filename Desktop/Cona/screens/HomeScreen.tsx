@@ -63,7 +63,7 @@ export default function HomeScreen() {
                 <Text style={styles.price}>₡ 3,000</Text>
                 <TouchableOpacity
                   style={styles.playButton}
-                  onPress={() => navigation.navigate('MatchInfo')}
+                  onPress={() => navigation.getParent()?.navigate('MatchInfo')}
                 >
                   <Text style={styles.playText}>Jugar</Text>
                 </TouchableOpacity>

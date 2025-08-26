@@ -38,7 +38,7 @@ export default function DevMenuScreen() {
     },
     {
       label: 'Tabs → Profile',
-      onPress: () => navigation.navigate('MainTabs', { screen: 'Profile' }),
+      onPress: () => navigation.navigate( screen, 'Profile' ),
     },
 
     // ------- Deep links inside the Home tab stack (if you have it nested) -------

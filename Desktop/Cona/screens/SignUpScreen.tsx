@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { supabase } from '../lib/supabase'; // ← ADDED
 
 const BRAND = '#A7EE43';
 const BG_DARK = '#142029';
@@ -35,7 +36,7 @@ export default function SignUpScreen() {
   const isEmailValid = (v: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
-  const onSubmit = () => {
+  const onSubmit = async () => { // ← CHANGED: async
     if (name.trim().length < 2) {
       Alert.alert('Nombre requerido', 'Ingresá tu nombre.');
       return;
@@ -57,10 +58,29 @@ export default function SignUpScreen() {
       return;
     }
 
-    // TODO: replace with real sign up
-    Alert.alert('Cuenta creada', 'Registro exitoso (demo).', [
-      { text: 'Ir a Ingresar', onPress: () => navigation.replace('SignIn') },
-    ]);
+    // ← ADDED: real sign up with Supabase
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: pass,
+        options: {
+          data: {
+            full_name: name.trim(),
+            phone: phone.trim(),
+          },
+        },
+      });
+
+      if (error) {
+        return Alert.alert('No se pudo crear la cuenta', error.message);
+      }
+
+      Alert.alert('Cuenta creada', 'Ahora iniciá sesión.', [
+        { text: 'OK', onPress: () => navigation.replace('SignIn') },
+      ]);
+    } catch (e: any) {
+      Alert.alert('Error', e?.message ?? 'Ocurrió un error inesperado.');
+    }
   };
 
   return (

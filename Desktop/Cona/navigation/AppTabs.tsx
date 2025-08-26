@@ -8,13 +8,8 @@ import ConaTabBar from '../components/ConaTabBar';
 
 import HomeScreen from '../screens/HomeScreen';
 import AllMatchesScreen from '../screens/AllMatchesScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import ProfileEmptyScreen from '../screens/ProfileEmptyScreen';
-
-// Temporary placeholder; replace later
-function CreateScreen() {
-  return null;
-}
+import CreateScreen from '../screens/CreateScreen';
+import ProfileTabWrapper from '../screens/ProfileTabWrapper';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -32,36 +27,21 @@ export default function AppTabs() {
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
-        // Make default bar invisible so your custom ConaTabBar “floats”
         tabBarStyle: {
           backgroundColor: 'transparent',
           position: 'absolute',
           borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
-          height: 84, // leaves space so content isn't covered by the floating bar
+          height: 84,
         },
       }}
       tabBar={(props: BottomTabBarProps) => <ConaTabBar {...props} />}
     >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{ title: 'Inicio' }}
-      />
-      <Tab.Screen
-        name="AllMatches"
-        component={AllMatchesScreen}
-        options={{ title: 'Buscar' }}
-      />
-      <Tab.Screen
-        name="Create"
-        component={CreateScreen}
-        options={{ title: 'Crear' }}
-      />
-     <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
-
-     
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Inicio' }} />
+      <Tab.Screen name="AllMatches" component={AllMatchesScreen} options={{ title: 'Buscar' }} />
+      <Tab.Screen name="Create" component={CreateScreen} options={{ title: 'Crear' }} />
+      <Tab.Screen name="Profile" component={ProfileTabWrapper} options={{ title: 'Perfil' }} />
     </Tab.Navigator>
   );
 }

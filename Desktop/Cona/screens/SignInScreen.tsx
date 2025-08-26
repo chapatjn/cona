@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { supabase } from '../lib/supabase'; // ← ADDED
 
 const BRAND = '#A7EE43';
 const BG_DARK = '#142029';
@@ -28,7 +29,7 @@ export default function SignInScreen() {
   const isEmailValid = (v: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
-  const onSubmit = () => {
+  const onSubmit = async () => { // ← CHANGED: async
     if (!isEmailValid(email)) {
       Alert.alert('Correo inválido', 'Ingresá un correo válido.');
       return;
@@ -37,10 +38,22 @@ export default function SignInScreen() {
       Alert.alert('Contraseña muy corta', 'Mínimo 6 caracteres.');
       return;
     }
-    // TODO: replace with real auth
-    Alert.alert('Ingreso', 'Login exitoso (demo).', [
-      { text: 'OK', onPress: () => navigation.goBack() },
-    ]);
+
+    // ← ADDED: real auth with Supabase
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      if (error) {
+        return Alert.alert('No se pudo iniciar sesión', error.message);
+      }
+
+      navigation.replace('MainTabs'); // abre las tabs
+    } catch (e: any) {
+      Alert.alert('Error', e?.message ?? 'Ocurrió un error inesperado.');
+    }
   };
 
   return (

@@ -99,11 +99,11 @@ export default function HomeScreen() {
               <Text style={styles.playerName}>
                 {
                   [
-                    'Manfred Ugalde',
-                    'Bukayo Saka',
-                    'Ansu Fati',
-                    'Santiago Van der Putten',
-                    'Victor Gyokares',
+                    '"Po"degard',
+                    'Alberto Lodio Todo',
+                    'Cigarros',
+                    'Maradroga',
+                    'Trapinho',
                   ][i]
                 }
               </Text>

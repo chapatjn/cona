@@ -1,5 +1,8 @@
+
 // screens/ProfileScreen.tsx
-import React from 'react';
+import { supabase } from '../lib/supabase';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -12,8 +15,112 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
-  const navigation = useNavigation<any>(); // ok for now
+  const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
+
+  // profile basics
+  const [fullName, setFullName]     = useState('');
+  const [firstName, setFirstName]   = useState('');
+  const [lastName, setLastName]     = useState('');
+  const [username, setUsername]     = useState('');
+  const [phone, setPhone]           = useState('');
+  const [avatarUrl, setAvatarUrl]   = useState<string | null>(null);
+  const [email, setEmail]           = useState('');
+
+  // KPIs (admin-managed)
+  const [goals, setGoals]               = useState<number>(0);
+  const [matchesPlayed, setMatches]     = useState<number>(0);
+  const [winPct, setWinPct]             = useState<number>(0); // can be 0–100 or 0–1
+
+  const loadProfile = useCallback(async () => {
+    const { data: { user }, error: userErr } = await supabase.auth.getUser();
+    if (userErr) {
+      console.warn('[Profile] getUser error:', userErr.message);
+      return;
+    }
+    if (user?.email) setEmail(user.email);
+
+    // Grab everything we need from profiles by id
+    const { data, error } = await supabase
+      .from('profiles')
+      .select(
+        'full_name, first_name, last_name, username, phone, avatar_url, goals, matches_played, win_pct'
+      )
+      .eq('id', user?.id ?? '')
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // 116 = No rows
+      console.warn('[Profile] select error:', error.message);
+      return;
+    }
+
+    if (data) {
+      setFullName(data.full_name ?? '');
+      setFirstName(data.first_name ?? '');
+      setLastName(data.last_name ?? '');
+      setUsername(data.username ?? '');
+      setPhone(data.phone ?? '');
+      setAvatarUrl(data.avatar_url ?? null);
+      setGoals(Number(data.goals ?? 0));
+      setMatches(Number(data.matches_played ?? 0));
+      setWinPct(Number(data.win_pct ?? 0));
+      return;
+    }
+
+    // No row? Create one (minimal) then reload
+    if (user?.id) {
+      const fallbackName =
+        (user.user_metadata?.full_name as string | undefined)?.trim() ||
+        (user.email ? user.email.split('@')[0] : '') ||
+        '';
+      const { error: insertErr } = await supabase
+        .from('profiles')
+        .insert({ id: user.id, full_name: fallbackName })
+        .single();
+      if (insertErr) {
+        console.warn('[Profile] insert error:', insertErr.message);
+        return;
+      }
+      // re-fetch
+      const { data: data2 } = await supabase
+        .from('profiles')
+        .select(
+          'full_name, first_name, last_name, username, phone, avatar_url, goals, matches_played, win_pct'
+        )
+        .eq('id', user.id)
+        .single();
+      if (data2) {
+        setFullName(data2.full_name ?? '');
+        setFirstName(data2.first_name ?? '');
+        setLastName(data2.last_name ?? '');
+        setUsername(data2.username ?? '');
+        setPhone(data2.phone ?? '');
+        setAvatarUrl(data2.avatar_url ?? null);
+        setGoals(Number(data2.goals ?? 0));
+        setMatches(Number(data2.matches_played ?? 0));
+        setWinPct(Number(data2.win_pct ?? 0));
+      }
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, [loadProfile])
+  );
+
+  // full_name → first+last → username → email
+  const displayName =
+    (fullName?.trim()) ||
+    [firstName, lastName].filter(Boolean).join(' ').trim() ||
+    (username?.trim()) ||
+    email ||
+    'Tu perfil';
+
+  // Show % nicely whether stored as 0–1 or 0–100
+  const winPctDisplay = Number.isFinite(winPct)
+    ? (winPct <= 1 ? Math.round(winPct * 100) : Math.round(winPct))
+    : 0;
 
   return (
     <View style={styles.screen}>
@@ -21,65 +128,58 @@ export default function ProfileScreen() {
       <View style={[styles.topBar, { paddingTop: Math.max(18, insets.top + 6) }]}>
         <View style={styles.topBarRow}>
           <Text style={styles.topBarTitle}>Perfil</Text>
-          {/* swap icon if you prefer another (see filenames below) */}
-          <Image
-            source={require('../assets/settings-icon.png')}
-            style={styles.topBarIcon}
-            resizeMode="contain"
-          />
+
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Settings')}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            activeOpacity={0.8}
+            style={styles.settingsBtn}
+          >
+            <Image
+              source={require('../assets/settings-icon.png')}
+              style={styles.settingsIcon}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingBottom: 120 }} // space for floating tab bar
+        contentContainerStyle={{ paddingBottom: 120 }}
       >
-        {/* ===== New Header (Logged-in) ===== */}
+        {/* ===== Header ===== */}
         <View style={styles.headerTop}>
           {/* Avatar */}
-          <View style={styles.avatarLg} />
+          {avatarUrl ? (
+            <Image source={{ uri: avatarUrl }} style={styles.avatarLg} resizeMode="cover" />
+          ) : (
+            <View style={styles.avatarLg} />
+          )}
 
-          {/* Name + stats */}
+          {/* Name + username (keeps typography) */}
           <View style={styles.nameBlock}>
-            <Text style={styles.displayName}>Alberto Odio</Text>
+            <Text style={styles.displayName}>{displayName}</Text>
             <View style={styles.inlineStats}>
-              <Text style={styles.inlineStatText}>54 partidos</Text>
-              <View style={styles.ratingWrap}>
-                <Text style={styles.inlineStatText}>3.5</Text>
-                <Text style={styles.star}>★</Text>
-              </View>
+              <Text style={styles.inlineStatText}>
+                {username ? `${username}` : '@usuario'}
+              </Text>
             </View>
           </View>
 
-          {/* Editar Perfil */}
-          <TouchableOpacity
-            style={styles.editBtn}
-            onPress={() => navigation.navigate('EditProfile' as never)} // wire later
-            activeOpacity={0.85}
-          >
-            <View style={styles.editInner}>
-              <Text style={styles.editText}>Editar Perfil</Text>
-              <Image
-                source={require('../assets/icon-edit.png')}
-                style={styles.editIcon}
-                resizeMode="contain"
-              />
-            </View>
-          </TouchableOpacity>
-
-          {/* KPIs pill */}
+          {/* KPIs pill (reactive) */}
           <View style={styles.kpiPillOuter}>
             <View style={styles.kpiPill}>
               <View style={styles.kpiCol}>
-                <Text style={styles.kpiNumber}>23</Text>
+                <Text style={styles.kpiNumber}>{goals}</Text>
                 <Text style={styles.kpiLabel}>Goles</Text>
               </View>
               <View style={styles.kpiCol}>
-                <Text style={styles.kpiNumber}>14</Text>
-                <Text style={styles.kpiLabel}>Asistencias</Text>
+                <Text style={styles.kpiNumber}>{matchesPlayed}</Text>
+                <Text style={styles.kpiLabel}>Partidos</Text>
               </View>
               <View style={styles.kpiCol}>
-                <Text style={styles.kpiNumber}>69%</Text>
+                <Text style={styles.kpiNumber}>{winPctDisplay}%</Text>
                 <Text style={styles.kpiLabel}>Victorias</Text>
               </View>
             </View>
@@ -165,7 +265,10 @@ const styles = StyleSheet.create({
   topBarRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center', // title left, icon right
+    justifyContent: 'center',
+    position: 'relative',
+    width: '100%',
+    minHeight: 44,
   },
   topBarTitle: {
     color: BRAND,
@@ -174,17 +277,19 @@ const styles = StyleSheet.create({
     fontFamily: 'PlusJakarta-Bold',
     textAlign: 'center',
   },
-  topBarIcon: {
-    position: 'absolute',
-    right: 0,
-    top: '50%',
-    marginTop: -12,  // half of icon height (24/2) to center vertically
-    width: 24,
-    height: 24,
-    tintColor: BRAND,
-  },
 
-  // ===== New header =====
+  // settings button (top-right)
+  settingsBtn: {
+    position: 'absolute',
+    right: 14,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingsIcon: { width: 24, height: 24, tintColor: BRAND },
+
+  // ===== Header =====
   headerTop: {
     width: '100%',
     backgroundColor: '#FFFFFF',
@@ -213,8 +318,6 @@ const styles = StyleSheet.create({
   },
   inlineStats: { flexDirection: 'row', alignItems: 'center', gap: 11 },
   inlineStatText: { color: '#000A14', fontSize: 16, fontFamily: 'PlusJakarta-Regular' },
-  ratingWrap: { width: 55, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
-  star: { color: '#EEC326', fontSize: 16 },
 
   editBtn: {
     width: 181,
@@ -244,7 +347,7 @@ const styles = StyleSheet.create({
   kpiNumber: { color: BRAND, fontSize: 18, fontFamily: 'PlusJakarta-Bold' },
   kpiLabel: { color: '#FFFFFF', fontSize: 12, fontFamily: 'PlusJakarta-Regular' },
 
-  // ===== Cards =====
+  // cards
   card: {
     backgroundColor: '#FFF',
     borderRadius: 16,
@@ -259,13 +362,11 @@ const styles = StyleSheet.create({
   },
   cardTitle: { fontSize: 20, fontFamily: 'PlusJakarta-Bold', color: '#142029', marginBottom: 12 },
 
-  // Awards
   awardRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   awardText: { flex: 1, marginLeft: 12 },
   awardTitle: { fontSize: 16, fontFamily: 'PlusJakarta-Bold', color: '#142029' },
   awardDate: { fontSize: 14, fontFamily: 'PlusJakarta-Regular', color: '#4B5563', marginTop: 4 },
 
-  // Previous matches
   previousCard: {
     backgroundColor: BG_DARK,
     borderRadius: 8,

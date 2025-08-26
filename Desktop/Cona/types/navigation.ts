@@ -11,5 +11,6 @@ export type RootStackParamList = {
   
     Profile: undefined;
     Payment: undefined | { matchId?: string };
+    Settings: undefined;
   };
   

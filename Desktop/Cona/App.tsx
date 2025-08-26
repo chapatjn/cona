@@ -1,73 +1,67 @@
 // App.tsx
-import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font';
 
-// Root flows
-import SplashScreen from './screens/SplashScreen';
+// Tabs
 import AppTabs from './navigation/AppTabs';
 
-// Auth modals
+// Screens
 import SignInScreen from './screens/SignInScreen';
 import SignUpScreen from './screens/SignUpScreen';
-
-// Dev / misc
 import DevMenuScreen from './screens/DevMenu';
 import MatchEndScreen from './screens/MatchEndScreen';
-
 import MatchInfoScreen from './screens/MatchInfoScreen';
 import PayScreen from './screens/PayScreen';
+import EditProfileScreen from './screens/EditProfileScreen';
+import SettingsScreen from './screens/SettingsScreen';
 
-// ---------- Types used across the app ----------
+// --- Option A (simple): keep local type and ADD 'Settings' ---
 export type RootStackParamList = {
-  Splash: undefined;
-  MainTabs: undefined;
-
-  // Auth
   SignIn: undefined;
   SignUp: undefined;
-
-  // Dev / misc
+  MainTabs: undefined;
+  EditProfile: undefined;
+  MatchEnd?: { matchId?: string };
+  MatchInfo?: { matchId?: string };
+  Payment?: { matchId?: string };
   DevMenu: undefined;
-  MatchEnd: undefined;
+  Settings: undefined; // ✅ add this
 };
+
+// --- Option B (recommended): delete the local type above and instead do ---
+// import { RootStackParamList } from './navigation/types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
-  // Load fonts once for the whole app
   const [fontsLoaded] = useFonts({
     'PlusJakarta-Bold': require('./assets/fonts/PlusJakartaSans-Bold.ttf'),
     'PlusJakarta-Regular': require('./assets/fonts/PlusJakartaSans-Regular.ttf'),
+
+    // aliases so existing styles keep working
+    'PlusJakarta-Medium': require('./assets/fonts/PlusJakartaSans-Regular.ttf'),
+    'PlusJakarta-SemiBold': require('./assets/fonts/PlusJakartaSans-Bold.ttf'),
     'PlusJakarta-Light': require('./assets/fonts/PlusJakartaSans-Light.ttf'),
+
+    // alias Inter -> PlusJakarta (you used Inter in a few places)
+    Inter: require('./assets/fonts/PlusJakartaSans-Bold.ttf'),
   });
 
   if (!fontsLoaded) return null;
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
-        {/* Launch */}
-        <Stack.Screen name="Splash" component={SplashScreen} />
+      <Stack.Navigator initialRouteName="MainTabs" screenOptions={{ headerShown: false }}>
+        {/* Auth */}
+        <Stack.Screen name="SignIn" component={SignInScreen} />
+        <Stack.Screen name="SignUp" component={SignUpScreen} />
 
-        {/* Main app (tabs) */}
+        {/* Tabs */}
         <Stack.Screen name="MainTabs" component={AppTabs} />
 
-        {/* Auth (presented modally above tabs) */}
-        <Stack.Screen
-          name="SignIn"
-          component={SignInScreen}
-          options={{ presentation: 'modal', headerShown: false }}
-        />
-        <Stack.Screen
-          name="SignUp"
-          component={SignUpScreen}
-          options={{ presentation: 'modal', headerShown: false }}
-        />
-
-        {/* Dev utilities */}
+        {/* Extra stack screens */}
         <Stack.Screen
           name="DevMenu"
           component={DevMenuScreen}
@@ -78,9 +72,10 @@ export default function App() {
           component={MatchEndScreen}
           options={{ headerShown: true, title: 'Match End' }}
         />
-
-        <Stack.Screen name="MatchInfo" component={MatchInfoScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Payment"  component={PayScreen}        options={{ headerShown: false }} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+        <Stack.Screen name="MatchInfo" component={MatchInfoScreen} />
+        <Stack.Screen name="Payment" component={PayScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

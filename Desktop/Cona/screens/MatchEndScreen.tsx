@@ -35,7 +35,7 @@ function useConaTabBarBridge(navigation: any): BottomTabBarProps {
     ],
   };
 
-  // ✅ Spanish labels to match AppTabs
+  // ✅ Spanish labels so footer shows "Crear" (and Inicio/Buscar/Perfil)
   const titles: Record<string, string> = {
     Home: 'Inicio',
     AllMatches: 'Buscar',
@@ -46,7 +46,7 @@ function useConaTabBarBridge(navigation: any): BottomTabBarProps {
   const descriptors: any = Object.fromEntries(
     state.routes.map((r: any) => [
       r.key,
-      { options: { title: titles[r.name] } }, // <- use Spanish title
+      { options: { title: titles[r.name], tabBarLabel: titles[r.name] } },
     ]),
   );
 
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  // UPDATED: edge-to-edge and taller
+  // Edge-to-edge and taller
   hero: {
     width: '100%',
     height: 220,
@@ -310,8 +310,8 @@ const styles = StyleSheet.create({
     borderColor: PILL_BORDER,
     paddingVertical: 6,
     paddingHorizontal: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center',      // center horizontally
+    justifyContent: 'center',  // center vertically
   },
   pillText: {
     color: PILL_BORDER,
